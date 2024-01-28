@@ -140,6 +140,24 @@ namespace MongoDB.Transaction
             .ToListAsync().ConfigureAwait(false);
 
             #endregion Find 2 documents in  ($lookup)
+
+            #region bulkwrite
+
+
+            var case3Object = new Parent(
+                       Id: Guid.NewGuid().ToString(),
+                       Name: "Parent 1",
+                       CreatedAt: DateTime.UtcNow,
+                       new string[] { case1ChildObject.Id });
+            var operations = new List<WriteModel<Parent>>();
+
+            var filter = Builders<Parent>.Filter.Eq(x => x.Id, case3Object.Id);
+            operations.Add(new ReplaceOneModel<Parent>(filter, case3Object) { IsUpsert = true });
+
+            var reslt = await parentCollection.BulkWriteAsync(operations).ConfigureAwait(false);
+
+
+            #endregion
         }
     }
 }
